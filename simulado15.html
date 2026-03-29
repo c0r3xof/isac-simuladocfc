@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 15 - Prova Oficial 2018</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: #007bff; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Portal</a>
+    <div id="res-topo">Prova Oficial 2018</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Finalizar Prova 2018</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"A placa R-1 indica parada obrigatória. O desrespeito a esta sinalização configura infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"Qual a função do servo-freio (hidrovácuo)?", a:"Travar as rodas", b:"Reduzir o esforço do condutor ao pisar no pedal de freio", c:"Limpar o fluido de freio", d:"Aumentar a velocidade", r:"B"},
+    {q:"A placa A-2a indica:", a:"Curva acentuada à esquerda", b:"Curva à esquerda", c:"Pista sinuosa", d:"Curva acentuada à direita", r:"B"},
+    {q:"O sinal sonoro de dois silvos breves emitido pelo agente de trânsito significa:", a:"Siga", b:"Pare", c:"Diminua a marcha", d:"Atenção", r:"B"},
+    {q:"Em caso de acidente com motocicleta, o que não deve ser feito?", a:"Sinalizar o local", b:"Retirar o capacete do motociclista", c:"Chamar o resgate", d:"Manter a vítima calma", r:"B"},
+    {q:"A placa R-21 indica:", a:"Alfândega", b:"Pedágio", c:"Fiscalização", d:"Pare", r:"A"},
+    {q:"O condutor que transita com o veículo produzindo fumaça ou gases acima dos níveis permitidos comete infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"B"},
+    {q:"Qual o nome da peça que sincroniza o movimento das válvulas com o pistão?", a:"Bateria", b:"Correia dentada", c:"Escapamento", d:"Radiador", r:"B"},
+    {q:"A placa A-31 indica:", a:"Trânsito de tratores ou maquinaria agrícola", b:"Obras na pista", c:"Cuidado, animais", d:"Pista escorregadia", r:"A"},
+    {q:"A 'distância de seguimento' deve ser medida em:", a:"Metros fixos", b:"Tempo (regra dos dois segundos)", c:"Tamanho do carro", d:"Pela velocidade apenas", r:"B"},
+    {q:"O órgão responsável pelo julgamento de recursos de multas em primeira instância é a:", a:"Contran", b:"JARI", c:"Detran", d:"Polícia Militar", r:"B"},
+    {q:"A placa R-15 indica o limite de:", a:"Altura máxima permitida", b:"Peso bruto", c:"Largura", d:"Comprimento", r:"A"},
+    {q:"Ao encontrar uma vítima inconsciente, mas respirando, você deve:", a:"Dar água", b:"Colocá-la em posição lateral de segurança (se não houver suspeita de lesão na coluna)", c:"Sentar a vítima", d:"Sacudi-la", r:"B"},
+    {q:"A luz de advertência no painel em formato de 'almotolia' (bule) indica:", a:"Falta de combustível", b:"Baixa pressão do óleo lubrificante", c:"Bateria fraca", d:"Porta aberta", r:"B"},
+    {q:"A placa A-15 alerta para:", a:"Parada obrigatória à frente", b:"Dê a preferência", c:"Cuidado, escola", d:"Semáforo", r:"A"},
+    {q:"O pedestre tem preferência de passagem quando:", a:"Já iniciou a travessia na faixa", b:"Está correndo", c:"O sinal está verde para os carros", d:"Sempre, em qualquer lugar da via", r:"A"},
+    {q:"A placa R-10 proíbe:", a:"Trânsito de veículos automotores", b:"Motos", c:"Bicicletas", d:"Caminhões", r:"A"},
+    {q:"A principal finalidade do óleo no motor é:", a:"Gerar energia", b:"Lubrificar e reduzir o atrito/calor entre as peças", c:"Limpar os vidros", d:"Resfriar os pneus", r:"B"},
+    {q:"O uso do triângulo de sinalização deve ser feito a no mínimo:", a:"10 metros", b:"30 metros da traseira do veículo", c:"1 metro", d:"Na frente do carro", r:"B"},
+    {q:"A placa A-33b indica:", a:"Passagem sinalizada de escolares", b:"Crianças jogando", c:"Pedestres", d:"Área de lazer", r:"A"},
+    {q:"Dirigir veículo com a validade da CNH vencida há mais de 30 dias é infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"A"},
+    {q:"O sistema de escapamento serve para:", a:"Aumentar o barulho", b:"Encaminhar os gases para fora e reduzir o ruído do motor", c:"Filtrar o combustível", d:"Lubrificar as rodas", r:"B"},
+    {q:"A placa R-2 proíbe o quê?", a:"Pare", b:"Dê a preferência (obrigatoriedade)", c:"Estacionar", d:"Seguir em frente", r:"B"},
+    {q:"Vítima de acidente com queimadura de 1º grau apresenta:", a:"Bolhas", b:"Vermelhidão e dor", c:"Pele carbonizada", d:"Frio", r:"B"},
+    {q:"A placa A-25 indica:", a:"Mão dupla adiante", b:"Sentido único", c:"Vire à esquerda", d:"Cuidado", r:"A"},
+    {q:"O condutor que for pego dirigindo sob influência de álcool terá a CNH:", a:"Apreendida por 2 dias", b:"Suspensa por 12 meses", c:"Cassada para sempre", d:"Nenhuma punição", r:"B"},
+    {q:"Qual componente transforma a corrente contínua da bateria em alta tensão para as velas?", a:"Alternador", b:"Bobina", c:"Distribuidor", d:"Carburador", r:"B"},
+    {q:"A placa R-24a indica:", a:"Sentido de circulação da via", b:"Vire à direita", c:"Siga em frente", d:"Mão única", r:"A"},
+    {q:"Onde não houver faixa, o pedestre deve atravessar a via em:", a:"Diagonal", b:"Sentido perpendicular ao eixo da via (reta)", c:"Correndo", d:"Não deve atravessar", r:"B"},
+    {q:"O tempo de reação do condutor é, em média:", a:"3 segundos", b:"1 segundo", c:"10 segundos", d:"Não existe tempo de reação", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 30!");
+}
+</script>
+</body>
+</html>
