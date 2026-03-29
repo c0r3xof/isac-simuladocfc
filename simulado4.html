@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 4 - CFC (Legislação e Crimes)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 6px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 4</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"O homicídio culposo na direção de veículo automotor tem pena de detenção de:", a:"1 a 2 anos", b:"2 a 4 anos", c:"5 a 10 anos", d:"6 meses", r:"B"},
+    {q:"A embriaguez ao volante é considerada crime de trânsito a partir de qual concentração de álcool por litro de sangue?", a:"0,1 dg/L", b:"0,6 g/L", c:"0,3 mg/L no ar alveolar", d:"Qualquer quantidade", r:"B"},
+    {q:"Qual a penalidade para quem disputa corrida (rachas) em via pública?", a:"Multa e suspensão do direito de dirigir", b:"Multa (10x), suspensão e apreensão do veículo", c:"Apenas advertência", d:"Multa leve", r:"B"},
+    {q:"O condutor que se nega a fazer o teste do bafômetro sofre as mesmas penalidades de quem dirige embriagado?", a:"Não", b:"Sim, as mesmas multas e suspensão", c:"Apenas se houver sinal de embriaguez", d:"Somente se houver acidente", r:"B"},
+    {q:"A suspensão do direito de dirigir ocorre quando o condutor atinge o limite de pontos em:", a:"6 meses", b:"12 meses", c:"24 meses", d:"5 anos", r:"B"},
+    {q:"Qual documento é retido quando o condutor dirige com o exame toxicológico vencido há mais de 30 dias?", a:"RG", b:"CNH", c:"CRLV", d:"CPF", r:"B"},
+    {q:"O crime de 'omissão de socorro' no trânsito ocorre mesmo que a vítima tenha morrido instantaneamente?", a:"Não, pois não há quem socorrer", b:"Sim, o dever de assistência é obrigatório", c:"Apenas se houver testemunhas", d:"Depende da decisão do policial", r:"B"},
+    {q:"Qual o limite de pontos para quem exerce atividade remunerada (EAR) independentemente da gravidade das infrações?", a:"20 pontos", b:"40 pontos", c:"30 pontos", d:"10 pontos", r:"B"},
+    {q:"O que é prevaricação no trânsito?", a:"Dirigir rápido", b:"Funcionário público que retarda ato de ofício para satisfazer interesse pessoal", c:"Fugir de blitz", d:"Subornar policial", r:"B"},
+    {q:"A pena para quem dirige com a CNH suspensa gerando perigo de dano é:", a:"Apenas multa", b:"Detenção de 6 meses a 1 ano", c:"Perda definitiva do direito de dirigir", d:"Cassação imediata do CPF", r:"B"},
+    {q:"A renovação do exame toxicológico para categorias C, D e E com menos de 70 anos deve ser feita a cada:", a:"5 anos", b:"2 anos e 6 meses", c:"1 ano", d:"10 anos", r:"B"},
+    {q:"Qual órgão é o coordenador máximo do Sistema Nacional de Trânsito?", a:"Detran", b:"Contran", c:"Ministério dos Transportes", d:"Denatran", r:"C"},
+    {q:"O sinal R-19 (Velocidade Máxima) é de:", a:"Advertência", b:"Regulamentação", c:"Indicação", d:"Serviços auxiliares", r:"B"},
+    {q:"A cassação da CNH obriga o condutor a esperar quanto tempo para se reabilitar?", a:"1 ano", b:"2 anos", c:"5 anos", d:"6 meses", r:"B"},
+    {q:"A infração por transitar em calçadas é de natureza:", a:"Média", b:"Grave", c:"Gravíssima (3x o valor)", d:"Leve", r:"C"},
+    {q:"Transportar criança sem o dispositivo de retenção (cadeirinha) é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"Qual a idade mínima para transportar crianças em motocicletas?", a:"7 anos", b:"10 anos", c:"12 anos", d:"5 anos", r:"B"},
+    {q:"O condutor que avança o sinal vermelho ou a parada obrigatória comete infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"Deixar de prestar socorro à vítima de acidente, quando solicitado pela autoridade, é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"A placa que indica a existência de um Pronto Socorro é uma placa de:", a:"Advertência", b:"Indicação (Serviços Auxiliares)", c:"Regulamentação", d:"Obras", r:"B"},
+    {q:"A advertência por escrito pode ser aplicada em infrações de natureza:", a:"Grave", b:"Leve ou Média (se o condutor não for reincidente em 12 meses)", c:"Apenas Gravíssima", d:"Em qualquer caso", r:"B"},
+    {q:"Quantos pontos são computados por uma infração Grave?", a:"7 pontos", b:"5 pontos", c:"4 pontos", d:"3 pontos", r:"B"},
+    {q:"O pedestre que atravessa fora da faixa ou em viadutos pode ser multado?", a:"Não", b:"Sim, em 50% do valor da infração leve", c:"Apenas se houver acidente", d:"Somente se for idoso", r:"B"},
+    {q:"Qual categoria é exigida para conduzir veículos articulados (carretas)?", a:"C", b:"E", c:"D", d:"B", r:"B"},
+    {q:"Para conduzir veículos de transporte escolar, o condutor deve ter idade superior a:", a:"18 anos", b:"21 anos", c:"25 anos", d:"30 anos", r:"B"},
+    {q:"A sinalização de trânsito que prevalece sobre as demais é:", a:"As placas", b:"As ordens do agente de trânsito", c:"O semáforo", d:"As faixas no chão", r:"B"},
+    {q:"Onde não houver faixa de pedestre, como eles devem atravessar?", a:"Em diagonal", b:"Em sentido perpendicular ao eixo da via", c:"Correndo", d:"Não devem atravessar", r:"B"},
+    {q:"A placa R-15 refere-se a:", a:"Altura máxima permitida", b:"Peso máximo por eixo", c:"Largura máxima", d:"Comprimento máximo", r:"A"},
+    {q:"A categoria B permite dirigir veículos que não excedam:", a:"3.500 kg de PBT e 8 lugares (excluído o motorista)", b:"5.000 kg", c:"12 lugares", d:"Qualquer peso", r:"A"},
+    {q:"As placas de identificação de rodovias federais têm formato de:", a:"Círculo", b:"Brasão", c:"Retângulo", d:"Triângulo", r:"B"},
+    {q:"A luz amarela intermitente no semáforo indica:", a:"Pare", b:"Siga com cuidado", c:"Acelere", d:"Sinal quebrado", r:"B"},
+    {q:"Onde é proibida a ultrapassagem?", a:"Em retas sinalizadas", b:"Em pontes, viadutos e curvas sem visibilidade", c:"Em vias de mão única", d:"Em avenidas largas", r:"B"},
+    {q:"O CRLV deve ser renovado:", a:"A cada 5 anos", b:"Anualmente", c:"Apenas na venda", d:"A cada 2 anos", r:"B"},
+    {q:"As infrações de trânsito são classificadas em:", a:"3 níveis", b:"4 níveis (Leve, Média, Grave, Gravíssima)", c:"2 níveis", d:"5 níveis", r:"B"},
+    {q:"O seguro DPVAT indeniza vítimas de acidentes em quais casos?", a:"Apenas morte", b:"Morte, invalidez permanente e despesas médicas", c:"Apenas danos ao carro", d:"Roubo do veículo", r:"B"},
+    {q:"Qual a cor das placas de serviços auxiliares?", a:"Verde", b:"Azul", c:"Marrom", d:"Branca", r:"B"},
+    {q:"Dirigir com apenas uma das mãos é permitido apenas quando:", a:"O motorista está cansado", b:"Para sinalizar manobras ou mudar marchas", c:"Em vias calmas", d:"Para usar o celular", r:"B"},
+    {q:"Qual órgão emite a CNH?", a:"Contran", b:"Detran", c:"Prefeitura", d:"Polícia Militar", r:"B"},
+    {q:"A placa A-14 indica:", a:"Sinal luminoso à frente", b:"Pare", c:"Cruzamento", d:"Curva acentuada", r:"A"},
+    {q:"O condutor que joga água em pedestres comete infração:", a:"Grave", b:"Média", c:"Leve", d:"Não é infração", r:"B"},
+    {q:"Para tirar a categoria C, o condutor deve estar habilitado na B há pelo menos:", a:"6 meses", b:"1 ano", c:"2 anos", d:"Não precisa", r:"B"},
+    {q:"A placa R-24a indica:", a:"Sentido de circulação da via", b:"Siga em frente", c:"Vire à direita", d:"Passagem obrigatória", r:"A"},
+    {q:"Fugir do local do acidente para evitar responsabilidade penal é:", a:"Infração administrativa apenas", b:"Crime de trânsito", c:"Permitido se não houver vítimas", d:"Direito de defesa", r:"B"},
+    {q:"A multa por dirigir sem CNH tem o valor multiplicado por:", a:"2 vezes", b:"3 vezes", c:"5 vezes", d:"10 vezes", r:"B"},
+    {q:"Estacionar em fila dupla é infração:", a:"Grave", b:"Média", c:"Gravíssima", d:"Leve", r:"A"},
+    {q:"O que significa JARI?", a:"Junta de Apoio Regional", b:"Junta Administrativa de Recursos de Infrações", c:"Justiça de Acidentes", d:"Jogo de Atendimento", r:"B"},
+    {q:"As placas indicativas de cor marrom referem-se a:", a:"Serviços", b:"Atrativos Turísticos", c:"Educação", d:"Obras", r:"B"},
+    {q:"O tempo de espera para reexame em caso de reprovação na prova prática é de:", a:"15 dias", b:"Não há mais tempo de espera (pode marcar imediato)", c:"30 dias", d:"7 dias", r:"B"},
+    {q:"Qual infração gera a suspensão direta da CNH, mesmo sem somar pontos?", a:"Estacionar na calçada", b:"Dirigir sob influência de álcool", c:"Falar ao celular", d:"Não usar cinto", r:"B"},
+    {q:"A placa R-10 indica:", a:"Proibido trânsito de veículos automotores", b:"Proibido estacionar", c:"Proibido bicicletas", d:"Carga pesada", r:"A"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50!");
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 1 - CFC</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #dee2e6; background: #fff; transition: 0.3s; border: 1px solid #eee; border-left: 6px solid #ddd; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; transition: 0.2s; }
+        .options label:hover { background: #e9ecef; }
+        .options input { margin-right: 12px; transform: scale(1.2); }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; border-color: #c3e6cb; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; border-color: #f5c6cb; }
+        .feedback { display: none; margin-top: 15px; padding: 10px; border-radius: 5px; font-weight: bold; background: rgba(255,255,255,0.5); }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .btn-check:hover { background: #218838; transform: translateY(-2px); }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 1</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas e Ver Erros</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"A placa R-1 indica:", a:"Parada obrigatória", b:"Dê a preferência", c:"Peso máximo permitido", d:"Sentido proibido", r:"A"},
+    {q:"Qual a validade da CNH para condutores com menos de 50 anos?", a:"5 anos", b:"10 anos", c:"3 anos", d:"20 anos", r:"B"},
+    {q:"A velocidade máxima em vias locais não sinalizadas é:", a:"40 km/h", b:"60 km/h", c:"30 km/h", d:"80 km/h", r:"C"},
+    {q:"O sinal sonoro de dois silvos breves indica:", a:"Siga", b:"Pare", c:"Diminua a marcha", d:"Atenção", r:"B"},
+    {q:"Dirigir sob influência de álcool é infração:", a:"Grave", b:"Média", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"A placa A-15 indica:", a:"Parada obrigatória", b:"Dê a preferência", c:"Parada obrigatória à frente", d:"Cuidado animais", r:"C"},
+    {q:"Qual categoria permite dirigir veículos motorizados de 2 ou 3 rodas?", a:"A", b:"B", c:"C", d:"D", r:"A"},
+    {q:"Onde não houver sinalização, a prioridade em rotatória é de quem:", a:"Vai entrar", b:"Já está circulando", c:"Vem pela direita", d:"Vem pela esquerda", r:"B"},
+    {q:"A ultrapassagem deve ser feita sempre pela:", a:"Direita", b:"Esquerda", c:"Acostamento", d:"Qualquer lado", r:"B"},
+    {q:"Frequência obrigatória em curso de reciclagem ocorre quando:", a:"O condutor for suspenso", b:"Cometer infração média", c:"Trocar de categoria", d:"Mudar de endereço", r:"A"},
+    {q:"O seguro obrigatório que cobre danos pessoais é o:", a:"IPVA", b:"DPVAT", c:"Licenciamento", d:"Seguro Total", r:"B"},
+    {q:"A sinalização horizontal é pintada no:", a:"Poste", b:"Pavimento/Pista", c:"Lado direito", d:"Painel", r:"B"},
+    {q:"Crianças com menos de 10 anos devem andar no:", a:"Banco da frente", b:"Banco de trás", c:"Colo do adulto", d:"Qualquer lugar", r:"B"},
+    {q:"A placa R-2 indica:", a:"Pare", b:"Dê a preferência", c:"Siga", d:"Proibido retornar", r:"B"},
+    {q:"Usar buzina de forma prolongada entre 22h e 06h é:", a:"Permitido", b:"Infração", c:"Recomendado", d:"Obrigatório", r:"B"},
+    {q:"Qual a cor das placas de advertência?", a:"Vermelha", b:"Amarela", c:"Azul", d:"Verde", r:"B"},
+    {q:"O condutor que desobedecer ao sinal vermelho comete infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"A linha dupla contínua na cor amarela indica:", a:"Permitido ultrapassar", b:"Proibido ultrapassar os dois sentidos", c:"Sentido único", d:"Estacionamento liberado", r:"B"},
+    {q:"Qual o tempo de renovação para motoristas com 70 anos ou mais?", a:"5 anos", b:"10 anos", c:"3 anos", d:"1 ano", r:"C"},
+    {q:"As placas de regulamentação têm formato:", a:"Circular", b:"Quadrado", c:"Triangular", d:"Retangular", r:"A"},
+    {q:"Estacionar em guia de calçada rebaixada (garagem) resulta em:", a:"Multa e remoção", b:"Apenas advertência", c:"Retenção da CNH", d:"Nada acontece", r:"A"},
+    {q:"O uso do cinto de segurança é:", a:"Opcional", b:"Obrigatório para todos", c:"Apenas para o motorista", d:"Apenas em rodovias", r:"B"},
+    {q:"O IPVA é um:", a:"Seguro", b:"Imposto", c:"Taxa de serviço", d:"Multa", r:"B"},
+    {q:"Transitar em velocidade superior à máxima em mais de 50% é infração:", a:"Média", b:"Grave", c:"Gravíssima (3x)", d:"Leve", r:"C"},
+    {q:"A placa R-25a indica:", a:"Vire à esquerda", b:"Vire à direita", c:"Siga em frente", d:"Retorno", r:"A"},
+    {q:"Onde pedestres devem cruzar a pista?", a:"Em qualquer lugar", b:"Na faixa de pedestres", c:"Entre os carros", d:"Correndo", r:"B"},
+    {q:"A luz de ré tem a cor:", a:"Vermelha", b:"Amarela", c:"Branca", d:"Laranja", r:"C"},
+    {q:"A categoria C serve para veículos de carga acima de:", a:"2000kg", b:"3500kg", c:"5000kg", d:"10000kg", r:"B"},
+    {q:"Abandonar o veículo na via por falta de combustível é infração:", a:"Leve", b:"Média", c:"Grave", d:"Gravíssima", r:"B"},
+    {q:"O CRLV é um documento de porte:", a:"Opcional", b:"Obrigatório", c:"Apenas para caminhões", d:"Substituível pelo RG", r:"B"},
+    {q:"A placa A-1b indica:", a:"Curva à direita", b:"Curva à esquerda", c:"Pista sinuosa", d:"Cruzamento", r:"A"},
+    {q:"O que significa a sigla CTB?", a:"Código de Trânsito Brasileiro", b:"Conselho de Trânsito do Brasil", c:"Centro de Treinamento", d:"Carro de Transporte", r:"A"},
+    {q:"O condutor deve manter distância de:", a:"Seguimento", b:"Parada", c:"Frenagem", d:"Colisão", r:"A"},
+    {q:"A placa R-3 indica:", a:"Proibido motos", b:"Sentido proibido", c:"Proibido caminhões", d:"Pare", r:"B"},
+    {q:"A cor da placa de sinalização de obras é:", a:"Amarela", b:"Laranja", c:"Cinza", d:"Preta", r:"B"},
+    {q:"Um silvo longo significa:", a:"Siga", b:"Diminua a marcha", c:"Pare", d:"Atenção", r:"B"},
+    {q:"Qual documento é de porte obrigatório além do CRLV?", a:"RG", b:"CNH ou PPD", c:"CPF", d:"Título de Eleitor", r:"B"},
+    {q:"O triângulo de segurança deve ser colocado a no mínimo:", a:"10 metros", b:"30 metros", c:"100 metros", d:"5 metros", r:"B"},
+    {q:"A placa R-4a indica:", a:"Proibido virar à esquerda", b:"Proibido retornar", c:"Sentido único", d:"Mão dupla", r:"A"},
+    {q:"Para habilitar na categoria D, a idade mínima é:", a:"18 anos", b:"21 anos", c:"19 anos", d:"25 anos", r:"B"},
+    {q:"A placa A-31 indica:", a:"Tratores", b:"Bicicletas", c:"Animais", d:"Escola", r:"A"},
+    {q:"Quantos pontos suspende a CNH se houver duas infrações gravíssimas?", a:"40 pontos", b:"20 pontos", c:"30 pontos", d:"15 pontos", r:"B"},
+    {q:"Falar ao celular enquanto dirige é infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"A placa R-6a indica:", a:"Estacionamento regulamentado", b:"Proibido estacionar", c:"Proibido parar", d:"Carga e descarga", r:"B"},
+    {q:"O sinal amarelo indica:", a:"Acelere", b:"Pare", c:"Atenção, pare se possível", d:"Siga", r:"C"},
+    {q:"A linha branca no pavimento indica:", a:"Mão dupla", b:"Sentido único", c:"Proibido ultrapassar", d:"Área escolar", r:"B"},
+    {q:"Onde não há calçada, o pedestre deve andar no:", a:"Meio da pista", b:"Acostamento em sentido oposto aos carros", c:"Lado direito", d:"Não deve andar", r:"B"},
+    {q:"A placa A-5a indica:", a:"Curva em S", b:"Pista sinuosa", c:"Cruzamento", d:"Entroncamento", r:"A"},
+    {q:"A renovação da PPD para CNH definitiva ocorre após:", a:"1 ano", b:"2 anos", c:"6 meses", d:"5 anos", r:"A"},
+    {q:"Qual órgão é responsável por aplicar multas em rodovias federais?", a:"Detran", b:"PRF", c:"Contran", d:"Prefeitura", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50 questões!");
+}
+</script>
+</body>
+</html>

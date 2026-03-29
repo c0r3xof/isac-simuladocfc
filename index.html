@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Simulados CFC</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 40px; text-align: center; }
+        h1 { color: #343a40; margin-bottom: 30px; }
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; max-width: 1000px; margin: 0 auto; }
+        .simulado-link { background: white; padding: 25px; border-radius: 12px; text-decoration: none; color: #007bff; font-weight: bold; font-size: 1.1em; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .simulado-link:hover { background: #007bff; color: white; transform: translateY(-5px); border-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Escolha seu Simulado CFC</h1>
+    <div class="container" id="menu">
+        <script>
+            for(let i=1; i<=10; i++) {
+                document.write(`<a href="simulado${i}.html" class="simulado-link">Simulado ${i}</a>`);
+            }
+        </script>
+    </div>
+</body>
+</html>

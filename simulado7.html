@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 7 - CFC (Infrações e Penalidades)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 7</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"Transitar pela contramão em vias de sentido único é infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"As medidas administrativas começam com as letras:", a:"P e M", b:"R e T", c:"A e S", d:"C e D", r:"B"},
+    {q:"Qual a pontuação de uma infração Média?", a:"3 pontos", b:"4 pontos", c:"5 pontos", d:"7 pontos", r:"B"},
+    {q:"O veículo será removido quando o condutor:", a:"Estacionar onde houver guia de calçada rebaixada (garagem)", b:"Parar sobre a faixa de pedestre", c:"Dirigir com apenas uma das mãos", d:"Não usar o cinto de segurança", r:"A"},
+    {q:"Transitar em velocidade superior à máxima em até 20% é infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"A"},
+    {q:"O sinal 'R-15' (Altura máxima) quando desobedecido gera infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"B"},
+    {q:"Não guardar distância de segurança lateral ou frontal entre veículos é infração:", a:"Leve", b:"Média", c:"Grave", d:"Gravíssima", r:"C"},
+    {q:"A retenção do veículo ocorre quando:", a:"A irregularidade puder ser sanada no local", b:"O condutor for mal educado", c:"O veículo for muito velho", d:"O pneu estiver furado", r:"A"},
+    {q:"Qual o valor aproximado da multa por infração Gravíssima (sem multiplicador)?", a:"R$ 130,16", b:"R$ 195,23", c:"R$ 293,47", d:"R$ 88,38", r:"C"},
+    {q:"Conduzir veículo com a cor ou característica alterada é infração:", a:"Grave", b:"Média", c:"Gravíssima", d:"Leve", r:"A"},
+    {q:"Deixar o condutor ou passageiro de usar o cinto de segurança gera:", a:"Multa e retenção do veículo para colocação do cinto", b:"Apenas multa", c:"Apreensão da CNH", d:"Advertência verbal", r:"A"},
+    {q:"As penalidades por dirigir embriagado incluem suspensão da CNH por:", a:"6 meses", b:"12 meses", c:"24 meses", d:"3 meses", r:"B"},
+    {q:"Usar o veículo para arremessar água ou detritos sobre pedestres é infração:", a:"Leve", b:"Média", c:"Grave", d:"Gravíssima", r:"B"},
+    {q:"Estacionar o veículo nas esquinas a menos de 5 metros do bordo do alinhamento é infração:", a:"Média", b:"Grave", c:"Leve", d:"Gravíssima", r:"A"},
+    {q:"Qual infração abaixo soma 3 pontos na CNH?", a:"Estacionar no acostamento", b:"Dirigir com o braço para fora", c:"Usar buzina de forma prolongada", d:"Transitar com o farol queimado", r:"A"},
+    {q:"Deixar de dar preferência a pedestre na faixa a ele destinada é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"A cassação da CNH pode ocorrer se o condutor dirigir:", a:"Com o farol apagado", b:"Estando com o direito de dirigir suspenso", c:"Sem óculos", d:"Em velocidade baixa", r:"B"},
+    {q:"Transitar com o veículo desligado ou desengrenado em declive (banguela) é infração:", a:"Média", b:"Grave", c:"Leve", d:"Gravíssima", r:"A"},
+    {q:"O condutor que for pego com som automotivo em volume não autorizado comete infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"B"},
+    {q:"Qual documento será recolhido se houver suspeita de inautenticidade?", a:"RG", b:"CNH e CRLV", c:"Título de eleitor", d:"Apenas o seguro", r:"B"},
+    {q:"Transitar com o veículo derramando carga sobre a via é infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"A"},
+    {q:"A advertência por escrito pode substituir uma multa em infrações:", a:"Grave", b:"Leve ou Média (se não reincidente em 12 meses)", c:"Apenas Leve", d:"Em qualquer infração", r:"B"},
+    {q:"A medida administrativa de 'Recolhimento da CNH' ocorre quando:", a:"O condutor é parado em qualquer blitz", b:"Houver suspeita de embriaguez ou CNH vencida há mais de 30 dias", c:"O veículo estiver sujo", d:"O motorista esquecer o RG", r:"B"},
+    {q:"Estacionar ao lado de outro veículo em fila dupla gera:", a:"Multa e remoção do veículo", b:"Apenas multa", c:"Advertência", d:"Cassação da CNH", r:"A"},
+    {q:"O valor da multa por dirigir sem possuir CNH é multiplicado por:", a:"2", b:"3", c:"5", d:"10", r:"B"},
+    {q:"Fazer retorno em locais proibidos pela sinalização é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"Conduzir veículo sem os equipamentos obrigatórios ou estando estes inoperantes é infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"B"},
+    {q:"O que acontece se o infrator não indicar o condutor no prazo legal (em caso de empresa)?", a:"Nova multa é aplicada (multa NIC)", b:"O carro é leiloado", c:"O dono é preso", d:"Nada acontece", r:"A"},
+    {q:"Transportar passageiros em compartimento de carga é infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"A"},
+    {q:"Qual a multa para quem usa o celular segurando ou manuseando o aparelho?", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"Bloquear a via com o veículo gera:", a:"Multa e apreensão do veículo", b:"Multa gravíssima e remoção", c:"Apenas advertência", d:"Multa leve", r:"B"},
+    {q:"Estacionar em vagas reservadas a idosos ou deficientes sem credencial é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"Transitar em ciclovias ou ciclofaixas é infração:", a:"Grave", b:"Gravíssima (3x o valor)", c:"Média", d:"Leve", r:"B"},
+    {q:"A recusa em se submeter ao teste do bafômetro gera multa de valor multiplicado por:", a:"3", b:"5", c:"10", d:"20", r:"C"},
+    {q:"Quem é o responsável pela infração referente à manutenção do veículo?", a:"O condutor", b:"O proprietário", c:"O mecânico", d:"O fabricante", r:"B"},
+    {q:"Quem é responsável por infrações de atos praticados na direção (ex: avançar sinal)?", a:"O proprietário", b:"O condutor", c:"O passageiro", d:"O Detran", r:"B"},
+    {q:"Seguir ambulância em serviço de urgência é infração:", a:"Grave", b:"Média", c:"Leve", d:"Gravíssima", r:"A"},
+    {q:"O que é transbordo?", a:"Mudar de ônibus", b:"Retirar o excesso de carga para outro veículo", c:"Limpar o motor", d:"Mudar de faixa", r:"B"},
+    {q:"Transitar com o veículo com as placas sem legibilidade é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"A velocidade mínima em uma via não pode ser inferior a:", a:"10 km/h", b:"A metade da velocidade máxima sinalizada", c:"30 km/h", d:"20 km/h", r:"B"},
+    {q:"Deixar de sinalizar mudança de direção (seta) é infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"B"},
+    {q:"O condutor que for pego dirigindo moto sem capacete tem a CNH:", a:"Suspensa diretamente", b:"Cassada", c:"Soma 4 pontos", d:"Não sofre penalidade na CNH", r:"A"},
+    {q:"Qual órgão julga os recursos de multa em 1ª instância?", a:"Contran", b:"JARI", c:"Detran", d:"Polícia Civil", r:"B"},
+    {q:"A pontuação por infração Leve é de:", a:"3 pontos", b:"4 pontos", c:"5 pontos", d:"7 pontos", r:"A"},
+    {q:"Participar de exibição ou demonstração de perícia em manobra perigosa gera multa multiplicada por:", a:"2", b:"5", c:"10", d:"20", r:"C"},
+    {q:"A placa R-4b (Proibido virar à direita) quando desobedecida gera infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"B"},
+    {q:"Deixar de reduzir a velocidade ao ultrapassar ciclista é infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"A"},
+    {q:"Transitar com o veículo em marcas de canalização (zebras) é infração:", a:"Grave", b:"Gravíssima (3x o valor)", c:"Média", d:"Leve", r:"B"},
+    {q:"A multa por dirigir sob efeito de álcool, em caso de reincidência em 12 meses, é aplicada:", a:"Pelo mesmo valor", b:"Em dobro", c:"Em triplo", d:"Gera prisão perpétua", r:"B"},
+    {q:"O condutor que estacionar sobre faixa de pedestre comete infração:", a:"Leve", b:"Média", c:"Grave", d:"Gravíssima", r:"C"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50!");
+}
+</script>
+</body>
+</html>

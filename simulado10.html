@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 10 - CFC (O Desafio Final)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: #007bff; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 10</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Finalizar Desafio de 500 Questões</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"A validade da CNH para condutores com menos de 50 anos é de:", a:"5 anos", b:"10 anos", c:"3 anos", d:"8 anos", r:"B"},
+    {q:"O condutor que comete uma infração gravíssima, uma grave e uma média em 12 meses soma quantos pontos?", a:"12 pontos", b:"16 pontos", c:"15 pontos", d:"19 pontos", r:"B"},
+    {q:"Qual a cor da sinalização horizontal que indica fluxos de mesmo sentido?", a:"Amarela", b:"Branca", c:"Vermelha", d:"Azul", r:"B"},
+    {q:"A placa A-38 indica:", a:"Largura limitada", b:"Altura limitada", c:"Sentido duplo", d:"Ponte móvel", r:"A"},
+    {q:"O uso do pisca-alerta em movimento é permitido quando:", a:"O motorista está com pressa", b:"Em situações de emergência ou quando a regulamentação da via determinar", c:"Sempre que chover", d:"Nunca é permitido", r:"B"},
+    {q:"Vítima de acidente em estado de choque apresenta:", a:"Pele quente e rosada", b:"Pulsação rápida e fraca, palidez e suor frio", c:"Muita energia", d:"Pressão alta", r:"B"},
+    {q:"Qual categoria de habilitação é necessária para conduzir um trator de rodas na via pública?", a:"Apenas A", b:"B, C, D ou E", c:"Apenas E", d:"Não precisa de habilitação", r:"B"},
+    {q:"A placa R-6a indica:", a:"Proibido Parar e Estacionar", b:"Proibido Estacionar", c:"Estacionamento Regulamentado", d:"Proibido parar", r:"B"},
+    {q:"O que significa a sigla CTB?", a:"Centro de Trânsito Brasileiro", b:"Código de Trânsito Brasileiro", c:"Conselho de Trânsito do Brasil", d:"Carros e Tráfego do Brasil", r:"B"},
+    {q:"O condutor que for pego com o exame toxicológico vencido há mais de 30 dias comete infração:", a:"Grave", b:"Gravíssima (multa 5x e suspensão)", c:"Média", d:"Leve", r:"B"},
+    {q:"A placa A-21c indica:", a:"Estreitamento de pista à esquerda", b:"Estreitamento de pista à direita", c:"Ponte estreita", d:"Pista irregular", r:"A"},
+    {q:"Em um cruzamento, a ordem que prevalece é:", a:"A do semáforo", b:"A do agente de trânsito", c:"A da placa de Pare", d:"A de quem chegar primeiro", r:"B"},
+    {q:"O que é 'distância de parada total'?", a:"Reação + Frenagem", b:"Apenas a frenagem", c:"A distância do retrovisor", d:"O tamanho do carro", r:"A"},
+    {q:"Qual órgão é responsável por criar as normas (leis) de trânsito?", a:"Detran", b:"Contran", c:"JARI", d:"Polícia Militar", r:"B"},
+    {q:"A placa R-19 de 80km/h em uma rodovia de pista dupla vale para:", a:"Apenas carros", b:"Todos os veículos", c:"Apenas caminhões", d:"Apenas motos", r:"B"},
+    {q:"Ao presenciar um acidente com vítima, se você não souber o que fazer, deve:", a:"Tentar mover a vítima", b:"Sinalizar o local e chamar o socorro especializado imediatamente", c:"Ir embora para não atrapalhar", d:"Ficar gritando", r:"B"},
+    {q:"O uso de luz alta em vias iluminadas é:", a:"Obrigatório", b:"Infração leve", c:"Recomendado", d:"Obrigatório se estiver sozinho", r:"B"},
+    {q:"A placa A-10a indica:", a:"Entroncamento oblíquo à esquerda", b:"Via lateral à esquerda", c:"Junções sucessivas", d:"Curva", r:"A"},
+    {q:"O sistema responsável por transmitir a força do motor para as rodas é o de:", a:"Arrefecimento", b:"Transmissão", c:"Suspensão", d:"Elétrico", r:"B"},
+    {q:"A placa R-25b indica:", a:"Vire à direita", b:"Siga à direita", c:"Sentido proibido", d:"Curva à direita", r:"A"},
+    {q:"Qual o limite de pontos para suspensão se o condutor tiver DUAS infrações gravíssimas?", a:"40 pontos", b:"30 pontos", c:"20 pontos", d:"15 pontos", r:"C"},
+    {q:"A placa A-7a indica:", a:"Via lateral à esquerda", b:"Entroncamento", c:"Bifurcação em Y", d:"Cruzamento", r:"A"},
+    {q:"O sinal sonoro de um silvo breve indica:", a:"Pare", b:"Siga", c:"Diminua a marcha", d:"Atenção", r:"B"},
+    {q:"Para que serve o fluido de freio?", a:"Para limpar os discos", b:"Para transmitir a pressão do pedal até as rodas", c:"Para esfriar o pneu", d:"Para lubrificar o motor", r:"B"},
+    {q:"A placa R-3 indica:", a:"Sentido proibido", b:"Proibido virar à esquerda", c:"Proibido retornar", d:"Mão única", r:"A"},
+    {q:"Um veículo com PBT de 4.000 kg pode ser dirigido por qual categoria?", a:"B", b:"C", c:"A", d:"ACC", r:"B"},
+    {q:"O que é a 'LADV'?", a:"Licença de Aprendizagem de Direção Veicular", b:"Lei de Apoio ao Deficiente Visual", d:"Luz de Advertência", d:"Laudo de Veículo", r:"A"},
+    {q:"A placa A-13b indica:", a:"Confluência à direita", b:"Entroncamento", c:"Via lateral", d:"Curva", r:"A"},
+    {q:"Onde deve ser feito o retorno em vias sem local específico?", a:"Em cima da calçada", b:"No acostamento, aguardando no lado direito para cruzar com segurança", c:"No meio da pista", d:"Não pode fazer", r:"B"},
+    {q:"A placa R-16 indica:", a:"Largura máxima permitida", b:"Altura máxima", c:"Comprimento", d:"Peso", r:"A"},
+    {q:"O crime de dirigir embriagado se caracteriza por concentração igual ou superior a:", a:"2 dg por litro de sangue", b:"6 dg por litro de sangue", c:"0,1 mg por litro de ar", d:"Qualquer cheiro", r:"B"},
+    {q:"A placa A-31 indica:", a:"Trânsito de tratores ou maquinaria agrícola", b:"Obras", c:"Cuidado, animais", d:"Pista irregular", r:"A"},
+    {q:"O que acontece se o condutor na PPD (Provisória) cometer uma infração Grave?", a:"Leva multa e continua", b:"Perde a habilitação e tem que reiniciar todo o processo", c:"Soma 5 pontos e espera 1 ano", d:"Ganha uma advertência", r:"B"},
+    {q:"A placa R-11 indica:", a:"Proibido trânsito de veículos de tração animal", b:"Proibido bicicletas", c:"Proibido carroças", d:"Permitido animais", r:"A"},
+    {q:"O catalisador faz parte de qual sistema?", a:"Elétrico", b:"Escapamento", c:"Alimentação", d:"Freio", r:"B"},
+    {q:"Qual a função da bateria no veículo?", a:"Gerar energia infinita", b:"Armazenar energia para a partida e sistemas elétricos", c:"Aumentar a velocidade", d:"Limpar o motor", r:"B"},
+    {q:"A placa A-15 indica:", a:"Parada obrigatória à frente", b:"Pare", c:"Cuidado", d:"Dê a preferência", r:"A"},
+    {q:"O pedestre que atravessa na faixa tem preferência sobre o carro que vai virar à direita?", a:"Não", b:"Sim", c:"Depende da cor do carro", d:"Só se for idoso", r:"B"},
+    {q:"A placa R-27 indica:", a:"Ônibus e caminhões mantenham-se à direita", b:"Proibido caminhões", c:"Área de carga", d:"Ponto de ônibus", r:"A"},
+    {q:"Quantas horas de aula prática de direção são obrigatórias para a categoria B?", a:"15 horas", b:"20 horas", c:"25 horas", d:"10 horas", r:"B"},
+    {q:"A placa A-42c indica:", a:"Pista dividida", b:"Início de pista dupla", c:"Fim de pista dupla", d:"Mão dupla", r:"A"},
+    {q:"O condutor deve manter a luz baixa ligada durante o dia em:", a:"Qualquer rua", b:"Rodovias de pista simples fora de perímetros urbanos", c:"Apenas dentro de túneis", d:"Nunca", r:"B"},
+    {q:"A placa R-31 indica:", a:"Pedestre, ande pela direita", b:"Proibido pedestre", c:"Área de pedestre", d:"Pedestre, ande pela esquerda", r:"A"},
+    {q:"Qual o telefone da Polícia Rodoviária Federal?", a:"190", b:"191", c:"192", d:"193", r:"B"},
+    {q:"A placa A-37 indica:", a:"Altura limitada", b:"Largura limitada", c:"Carga máxima", d:"Ponte estreita", r:"A"},
+    {q:"O freio ABS serve para:", a:"Parar o carro mais rápido em qualquer piso", b:"Evitar o travamento das rodas e permitir o controle da direção em frenagens bruscas", c:"Economizar pastilhas", d:"Fazer barulho", r:"B"},
+    {q:"A placa R-28 indica:", a:"Mão dupla", b:"Sentido único", c:"Siga em frente", d:"Entrada proibida", r:"A"},
+    {q:"Arremessar o veículo sobre pedestres para jogar água é infração:", a:"Leve", b:"Média", c:"Grave", d:"Gravíssima", r:"B"},
+    {q:"A placa A-25 indica:", a:"Mão dupla adiante", b:"Sentido único", c:"Vire à esquerda", d:"Retorno", r:"A"},
+    {q:"Ao completar 500 questões de simulado, o aluno está:", a:"Cansado", b:"Muito mais preparado para a prova do CFC", c:"Sem sorte", d:"Ignorando as leis", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("PARABÉNS! Você concluiu as 500 questões!\nNeste último bloco você acertou " + acertos + " de 50.");
+}
+</script>
+</body>
+</html>

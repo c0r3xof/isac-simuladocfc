@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 3 - CFC (Mecânica e Meio Ambiente)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 3</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"Qual sistema é responsável por manter a estabilidade do veículo em curvas?", a:"Sistema de alimentação", b:"Sistema de suspensão", c:"Sistema de ignição", d:"Sistema de lubrificação", r:"B"},
+    {q:"O componente que transforma a energia química do combustível em energia mecânica é o:", a:"Radiador", b:"Alternador", c:"Motor", d:"Carburador", r:"C"},
+    {q:"A bateria do veículo serve para:", a:"Resfriar o motor", b:"Armazenar energia elétrica para a partida e luzes", c:"Aumentar a velocidade", d:"Filtrar o combustível", r:"B"},
+    {q:"O painel de instrumentos indica que a temperatura do motor subiu muito. O problema pode ser no:", a:"Sistema de freios", b:"Sistema de arrefecimento", c:"Sistema de transmissão", d:"Sistema de direção", r:"B"},
+    {q:"O catalisador faz parte de qual sistema?", a:"Elétrico", b:"Arrefecimento", c:"Escapamento", d:"Lubrificação", r:"C"},
+    {q:"Qual peça é responsável por gerar faísca e queimar o combustível no motor?", a:"Bateria", b:"Vela de ignição", c:"Bobina", d:"Injeção eletrônica", r:"B"},
+    {q:"Pneus gastos (carecas) aumentam o risco de:", a:"Economia de combustível", b:"Aquaplanagem e falta de aderência", c:"Melhor frenagem", d:"Aumento da potência", r:"B"},
+    {q:"O óleo do motor deve ser verificado com o motor:", a:"Quente e ligado", b:"Frio e em local plano", c:"Em alta velocidade", d:"Apenas uma vez por ano", r:"B"},
+    {q:"A finalidade do sistema de lubrificação é:", a:"Evitar o superaquecimento das rodas", b:"Reduzir o atrito e o desgaste das peças internas do motor", c:"Aumentar o ruído do motor", d:"Limpar os vidros", r:"B"},
+    {q:"O alternador serve para:", a:"Trocar as marchas sozinho", b:"Gerar energia para carregar a bateria com o motor ligado", c:"Parar o carro", d:"Ligar o rádio", r:"B"},
+    {q:"Qual sistema transmite a força do motor para as rodas?", a:"Sistema de transmissão", b:"Sistema de suspensão", c:"Sistema de freios", d:"Sistema de direção", r:"A"},
+    {q:"O fluído de freio deve ser trocado:", a:"Nunca", b:"Conforme a recomendação do fabricante", c:"Apenas se o carro bater", d:"Toda semana", r:"B"},
+    {q:"Fumaça preta saindo pelo escapamento indica:", a:"Motor frio", b:"Queima excessiva de combustível (desregulagem)", c:"O óleo está bom", d:"Falta de água", r:"B"},
+    {q:"O que é o sistema ABS?", a:"Sistema que trava as rodas", b:"Sistema que evita o travamento das rodas em frenagens bruscas", c:"Um tipo de pneu", d:"Um óleo especial", r:"B"},
+    {q:"Como o condutor pode poluir menos o meio ambiente?", a:"Mantendo o motor regulado", b:"Acelerando forte em pontos mortos", c:"Retirando o catalisador", d:"Usando pneus carecas", r:"A"},
+    {q:"O descarte de baterias deve ser feito:", a:"No lixo comum", b:"Devolvendo ao revendedor ou fabricante", c:"Jogando no rio", d:"Enterrando no quintal", r:"B"},
+    {q:"Qual gás é emitido pelos veículos e é altamente tóxico?", a:"Oxigênio", b:"Monóxido de Carbono", c:"Nitrogênio", d:"Hélio", r:"B"},
+    {q:"A poluição sonora no trânsito é causada principalmente por:", a:"Uso excessivo de buzinas e escapamentos abertos", b:"Uso do cinto de segurança", c:"Baixa velocidade", d:"Pintura do carro", r:"A"},
+    {q:"O canister serve para:", a:"Resfriar o óleo", b:"Absorver vapores de combustível do tanque", c:"Limpar o para-brisa", d:"Iluminar a pista", r:"B"},
+    {q:"Jogar lixo na rodovia causa:", a:"Beleza na pista", b:"Riscos de acidentes e poluição ambiental", c:"Melhora no trânsito", d:"Alimentação para animais", r:"B"},
+    {q:"O principal componente do sistema de direção é:", a:"O pedal", b:"O volante", c:"O pneu reserva", d:"O retrovisor", r:"B"},
+    {q:"O sistema de arrefecimento utiliza basicamente:", a:"Óleo e graxa", b:"Água e aditivo (etilenoglicol)", c:"Ar e combustível", d:"Apenas ar frio", r:"B"},
+    {q:"Amortecedores vencidos podem causar:", a:"Mais conforto", b:"Instabilidade e perda de controle em curvas", c:"Economia de freios", d:"Aumento da luz dos faróis", r:"B"},
+    {q:"A embreagem serve para:", a:"Aumentar a velocidade", b:"Interromper a força do motor para trocar as marchas", c:"Frear o carro", d:"Ligar o ar condicionado", r:"B"},
+    {q:"Qual a função do radiador?", a:"Iluminar o painel", b:"Trocar calor para resfriar a água do motor", c:"Limpar o óleo", d:"Ligar o motor", r:"B"},
+    {q:"O que é o manual do proprietário?", a:"Um livro de histórias", b:"Documento com normas de manutenção e uso do veículo", c:"Um guia de cidades", d:"Opcional na compra", r:"B"},
+    {q:"O uso de combustível adulterado pode:", a:"Limpar o motor", b:"Danificar o sistema de injeção e motor", c:"Melhorar o desempenho", d:"Não causa problemas", r:"B"},
+    {q:"A baixa pressão dos pneus causa:", a:"Mais estabilidade", b:"Desgaste irregular e maior consumo de combustível", c:"Menor consumo", d:"Vida longa aos pneus", r:"B"},
+    {q:"Onde se localiza o reservatório de óleo de freio?", a:"Dentro do motor", b:"No painel", c:"No porta-malas", d:"Debaixo do banco", r:"A"},
+    {q:"Luz vermelha de óleo acesa no painel significa:", a:"Combustível acabando", b:"Baixa pressão de lubrificação ou falta de óleo", c:"Motor muito frio", d:"Luz de freio ligada", r:"B"},
+    {q:"O sistema elétrico é composto por:", a:"Pneus e molas", b:"Bateria, alternador e cabos", c:"Motor e radiador", d:"Óleo e filtro", r:"B"},
+    {q:"A função do filtro de ar é:", a:"Resfriar o motor", b:"Reter impurezas do ar que vai para o motor", c:"Limpar o escapamento", d:"Aumentar o som", r:"B"},
+    {q:"O fluido do radiador deve ser verificado:", a:"Uma vez por ano", b:"Periodicamente (ex: semanalmente)", c:"Só quando o carro parar", d:"Apenas em viagens longas", r:"B"},
+    {q:"O que causa a trepidação no volante em certas velocidades?", a:"Falta de óleo", b:"Rodas desbalanceadas", c:"Luz alta", d:"Ar condicionado ligado", r:"B"},
+    {q:"O que significa 'veículo puxando para um lado'?", a:"Pneu furado ou falta de alinhamento", b:"Vento forte sempre", c:"Excesso de óleo", d:"Problema na bateria", r:"A"},
+    {q:"O catalisador deve ser trocado quando:", a:"Mudar a cor do carro", b:"Estiver danificado ou perder a eficiência", c:"O motor estiver frio", d:"Nunca se troca", r:"B"},
+    {q:"A queima de combustíveis fósseis contribui para:", a:"Diminuir o calor", b:"O efeito estufa e poluição do ar", c:"Aumento de oxigênio", d:"Cura de doenças", r:"B"},
+    {q:"Qual atitude é ecologicamente correta?", a:"Lavar o carro com mangueira aberta", b:"Manter o veículo em boas condições de uso", c:"Jogar pontas de cigarro pela janela", d:"Trocar o óleo na terra", r:"B"},
+    {q:"O ruído excessivo do motor pode ser:", a:"Falta de água", b:"Problema no escapamento ou silenciador", c:"Bateria fraca", d:"Pneu murcho", r:"B"},
+    {q:"Os órgãos ambientais controlam a emissão de gases através do:", a:"IPVA", b:"PROCONVE", c:"DPVAT", d:"CNH", r:"B"},
+    {q:"O que fazer com o óleo lubrificante usado?", a:"Jogar no esgoto", b:"Entregar em postos de coleta para reciclagem", c:"Queimar no quintal", d:"Usar para regar plantas", r:"B"},
+    {q:"A manutenção do sistema de freios inclui verificar:", a:"A água", b:"Pastilhas e lonas", c:"O alternador", d:"O rádio", r:"B"},
+    {q:"Onde fica o filtro de óleo?", a:"Acoplado ao motor", b:"No escapamento", c:"No painel", d:"No tanque", r:"A"},
+    {q:"Para que servem os fusíveis no carro?", a:"Para economizar combustível", b:"Para proteger o sistema elétrico contra curtos-circuitos", c:"Para aumentar a luz", d:"Para ligar o carro", r:"B"},
+    {q:"A correia dentada deve ser trocada:", a:"Só se quebrar", b:"Conforme a quilometragem recomendada pelo manual", c:"Toda semana", d:"A cada 10 anos", r:"B"},
+    {q:"O sistema de ignição eletrônica substituiu o antigo:", a:"Motor", b:"Platinado e distribuidor", c:"Radiador", d:"Pneu", r:"B"},
+    {q:"O que é o 'ponto morto'?", a:"Motor desligado", b:"Engrenagens da transmissão em neutro (sem tração)", c:"Carro sem freio", d:"Lugar perigoso", r:"B"},
+    {q:"O nível da água da bateria (se não for selada) deve ser completado com:", a:"Água da torneira", b:"Água destilada", c:"Água mineral", d:"Álcool", r:"B"},
+    {q:"O que é o 'hodômetro'?", a:"Mede a velocidade atual", b:"Mede a distância percorrida pelo veículo", c:"Mede a temperatura", d:"Mede o nível de óleo", r:"B"},
+    {q:"A reciclagem de peças de veículos ajuda a:", a:"Poluir mais", b:"Preservar recursos naturais e diminuir o lixo", c:"Aumentar o preço", d:"Diminuir a segurança", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50!");
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 6 - CFC (Defensiva e Socorros)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 6</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"Em caso de acidente com fios de eletricidade sobre o carro, o condutor deve:", a:"Sair correndo do veículo", b:"Permanecer dentro do veículo e aguardar socorro", c:"Pular do carro com os dois pés juntos", d:"Tentar afastar os fios com as mãos", r:"B"},
+    {q:"A principal causa de colisões frontais em rodovias é:", a:"Excesso de velocidade", b:"Ultrapassagem indevida", c:"Falta de freios", d:"Pista molhada", r:"B"},
+    {q:"O uso do colar cervical serve para:", a:"Imobilizar o pescoço e proteger a medula", b:"Aliviar dor de garganta", c:"Ajudar a vítima a respirar", d:"Parar hemorragias", r:"A"},
+    {q:"Ao conduzir sob chuva, se o volante ficar 'leve', você está:", a:"Aquaplanando", b:"Com pneu furado", c:"Em uma descida", d:"Com falta de óleo", r:"A"},
+    {q:"Como se deve sinalizar um acidente ocorrido à noite em uma via de 80km/h?", a:"A 20 metros", b:"A 80 metros ou passos largos", c:"A 40 metros", d:"No teto do carro", r:"B"},
+    {q:"Vítima de acidente reclama de sede. Você deve:", a:"Dar bastante água", b:"Dar apenas um gole de suco", c:"Não dar nada de beber ou comer", d:"Dar leite", r:"C"},
+    {q:"O condutor 'corretivo' é aquele que:", a:"Antecipa o perigo", b:"Só age após o perigo acontecer", c:"Revisa o carro sempre", d:"Respeita as placas", r:"B"},
+    {q:"A técnica de 'dois segundos' serve para medir:", a:"O tempo de reação", b:"A distância de seguimento", c:"O tempo de frenagem", d:"A validade da CNH", r:"B"},
+    {q:"Em caso de convulsão, a atitude correta é:", a:"Segurar a língua da vítima", b:"Proteger a cabeça e afastar objetos próximos", c:"Dar algo para ela morder", d:"Jogar água fria", r:"B"},
+    {q:"A cegueira momentânea causada pelo excesso de luz chama-se:", a:"Penumbra", b:"Ofuscamento", c:"Miopia", d:"Reflexo", r:"B"},
+    {q:"O que é 'imperícia'?", a:"Falta de atenção", b:"Falta de habilidade técnica", c:"Desobediência às leis", d:"Beber e dirigir", r:"B"},
+    {q:"Qual a sequência correta das ações de primeiros socorros?", a:"Sinalizar o local, chamar socorro, atender vítimas", b:"Atender vítimas, sinalizar, fugir", c:"Chamar o guincho e ir embora", d:"Remover as vítimas e depois sinalizar", r:"A"},
+    {q:"A hemorragia nasal deve ser tratada:", a:"Inclinando a cabeça para trás", b:"Inclinando a cabeça para frente e comprimindo as narinas", c:"Colocando algodão com álcool", d:"Fazendo a vítima correr", r:"B"},
+    {q:"Condição adversa de 'Tempo' refere-se a:", a:"Relógio quebrado", b:"Chuva, neblina, vento", c:"Buracos", d:"Cansaço", r:"B"},
+    {q:"Em uma ladeira (aclive), para arrancar o carro com segurança, usa-se:", a:"Apenas o freio de pé", b:"O freio de mão para auxiliar a saída", c:"Ponto morto", d:"Luz alta", r:"B"},
+    {q:"A massagem cardíaca deve ser feita:", a:"No abdômen", b:"No centro do tórax, entre os mamilos", c:"No pescoço", d:"Nas costas", r:"B"},
+    {q:"O 'Ponto Cego' é mais perigoso para:", a:"Pedestres", b:"Motociclistas que vêm ao lado", c:"Caminhões à frente", d:"Aviões", r:"B"},
+    {q:"Se uma vítima estiver com as vísceras expostas, você deve:", a:"Tentar colocá-las de volta", b:"Cobrir com um pano limpo e úmido e não pressionar", c:"Lavar com bastante sabão", d:"Deixar ao sol", r:"B"},
+    {q:"A força que puxa o carro para dentro da curva chama-se:", a:"Centrífuga", b:"Centrípeta", c:"Gravidade", d:"Inércia", r:"B"},
+    {q:"Ao socorrer alguém com parada respiratória, qual o primeiro passo?", a:"Fazer massagem cardíaca", b:"Limpar as vias aéreas (boca e nariz)", c:"Dar água", d:"Gritar", r:"B"},
+    {q:"Pneus com pressão alta demais causam:", a:"Mais conforto", b:"Desgaste no centro da banda de rodagem", c:"Mais aderência", d:"Economia extrema", r:"B"},
+    {q:"O efeito 'estilingue' ocorre em colisões:", a:"Frontais", b:"Traseiras", c:"Laterais", d:"Capotamentos", r:"B"},
+    {q:"Para atravessar um trecho alagado com segurança, deve-se:", a:"Engatar a 1ª marcha e manter a aceleração constante", b:"Passar em alta velocidade", c:"Trocar de marcha no meio da água", d:"Desligar o motor", r:"A"},
+    {q:"Fratura aberta é aquela onde:", a:"O osso não quebrou de verdade", b:"O osso rompe a pele e fica exposto", c:"Dói pouco", d:"Ocorre no crânio", r:"B"},
+    {q:"A luz de neblina deve ser usada:", a:"Em qualquer noite", b:"Apenas sob neblina ou chuva densa", c:"Para substituir o farol queimado", d:"Sempre ligada", r:"B"},
+    {q:"O condutor defensivo deve olhar:", a:"Apenas para o carro da frente", b:"Para os lados, retrovisores e bem à frente", c:"Apenas para o painel", d:"Para a paisagem", r:"B"},
+    {q:"Vítima presa nas ferragens. Você deve:", a:"Puxar com força", b:"Chamar o Corpo de Bombeiros (193)", c:"Usar um pé de cabra", d:"Virar o carro", r:"B"},
+    {q:"O uso de drogas afeta o condutor:", a:"Melhorando a visão", b:"Diminuindo a capacidade de julgamento e reflexos", c:"Deixando-o mais esperto", d:"Não afeta", r:"B"},
+    {q:"A sinalização de acidente em curva deve começar:", a:"No meio da curva", b:"Antes da curva começar", c:"Depois da curva", d:"Não precisa sinalizar", r:"B"},
+    {q:"O 'Triângulo de Segurança' é um equipamento:", a:"Opcional", b:"Obrigatório", c:"Apenas para viagens", d:"Para enfeite", r:"B"},
+    {q:"Como agir se o freio falhar em uma descida?", a:"Pular do carro", b:"Reduzir as marchas gradualmente e usar o freio de mão com cautela", c:"Desligar o motor", d:"Gritar por socorro", r:"B"},
+    {q:"O estado de choque pode causar:", a:"Fome", b:"Sede, frio e desmaio", c:"Calor excessivo", d:"Euforia", r:"B"},
+    {q:"As cores das luzes do semáforo são, respectivamente:", a:"Verde, Amarelo, Vermelho", b:"Azul, Branco, Preto", c:"Laranja, Roxo, Cinza", d:"Vermelho, Rosa, Verde", r:"A"},
+    {q:"Ao verificar a respiração da vítima, você deve:", a:"Ver, ouvir e sentir", b:"Apenas olhar de longe", c:"Apertar o nariz", d:"Dar um tapa no rosto", r:"A"},
+    {q:"A fadiga é causada por:", a:"Excesso de descanso", b:"Longos períodos dirigindo sem pausa", c:"Comer pouco", d:"Ouvir rádio baixo", r:"B"},
+    {q:"Qual o telefone do SAMU?", a:"190", b:"192", c:"193", d:"153", r:"B"},
+    {q:"Em caso de fumaça no motor, você deve:", a:"Jogar água no motor quente", b:"Usar o extintor direcionando para a base do fogo", c:"Abrir o capô de uma vez", d:"Soprar", r:"B"},
+    {q:"O cinto de segurança abdominal é comum em:", a:"Bancos traseiros centrais", b:"Carros de corrida", c:"Bancos da frente", d:"Motos", r:"A"},
+    {q:"Para evitar o ofuscamento pelo sol, usa-se:", a:"Luz alta", b:"Pala de proteção (quebra-sol) ou óculos escuros", c:"Mão na frente dos olhos", d:"Fechar os olhos", r:"B"},
+    {q:"A 'distância de frenagem' é:", a:"Do susto até o freio", b:"Do momento que pisa no freio até a parada total", c:"A soma de tudo", d:"A distância do poste", r:"B"},
+    {q:"Ao dirigir moto, o visor do capacete deve estar:", a:"Levantado para ventilar", b:"Abaixado totalmente", c:"Pode estar sem visor", d:"Apenas de dia", r:"B"},
+    {q:"Queimaduras de 3º grau atingem:", a:"Apenas a pele", b:"Todas as camadas da pele e tecidos profundos", c:"Só os pelos", d:"Causam apenas vermelhidão", r:"B"},
+    {q:"A posição lateral de segurança serve para:", a:"Vítimas conscientes", b:"Vítimas inconscientes que respiram (evita sufocamento)", c:"Vítimas com fratura na perna", d:"Dormir no carro", r:"B"},
+    {q:"Dirigir descalço é:", a:"Proibido sempre", b:"Permitido (desde que o calçado não atrapalhe os pedais)", c:"Obrigatório", d:"Gera multa grave", r:"B"},
+    {q:"O maior perigo do vento lateral é:", a:"Sujeira nos olhos", b:"Perda de estabilidade e deslocamento do veículo", c:"Gasto de combustível", d:"Estragar a pintura", r:"B"},
+    {q:"O condutor preventivo é:", a:"O que espera o erro dos outros", b:"O que antecipa situações de risco", c:"O que dirige devagar na esquerda", d:"O que não usa cinto", r:"B"},
+    {q:"Qual atitude tomar com vítima de choque elétrico?", a:"Tocar nela imediatamente", b:"Desligar a chave geral ou afastar o fio com objeto isolante seco", c:"Jogar água", d:"Puxar pelo braço", r:"B"},
+    {q:"Trafegar pelo acostamento é permitido:", a:"Para ultrapassar", b:"Apenas em emergências ou acesso a lotes lindeiros", c:"Quando o trânsito está parado", d:"Nunca", r:"B"},
+    {q:"A primeira providência ao chegar num acidente é:", a:"Ver as vítimas", b:"Garantir a própria segurança e sinalizar", c:"Remover os veículos", d:"Tirar fotos", r:"B"},
+    {q:"Um condutor que não descansa pode ter 'microsoldos' que duram:", a:"1 hora", b:"Poucos segundos (suficiente para um acidente fatal)", c:"10 minutos", d:"Não existem microssonhos", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50!");
+}
+</script>
+</body>
+</html>

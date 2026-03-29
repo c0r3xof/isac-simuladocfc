@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 5 - CFC (Sinalização e Revisão)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 6px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 5</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"A placa R-6c indica:", a:"Proibido Parar e Estacionar", b:"Proibido Estacionar", c:"Estacionamento Regulamentado", d:"Proibido parar", r:"A"},
+    {q:"As placas que têm por finalidade alertar os usuários sobre condições potencialmente perigosas são:", a:"De Regulamentação", b:"De Advertência", c:"De Indicação", d:"Educativas", r:"B"},
+    {q:"A placa A-1a indica:", a:"Curva acentuada à esquerda", b:"Curva à direita", c:"Pista sinuosa", d:"Curva em S", r:"A"},
+    {q:"Qual a função das placas de cores azul e branca com brasões?", a:"Advertência", b:"Indicação (Identificação de Rodovias)", c:"Obras", d:"Turismo", r:"B"},
+    {q:"A placa R-15 indica:", a:"Largura máxima permitida", b:"Altura máxima permitida", c:"Peso bruto total", d:"Comprimento máximo", r:"B"},
+    {q:"A sinalização vertical de advertência tem formato:", a:"Circular", b:"Quadrado (colocado em diagonal/losango)", c:"Triangular", d:"Retangular", r:"B"},
+    {q:"A placa R-26 indica:", a:"Siga em frente", b:"Sentido proibido", c:"Passagem obrigatória", d:"Vire à esquerda", r:"A"},
+    {q:"Qual infração é cometida ao desobedecer a qualquer placa de regulamentação?", a:"Média", b:"Grave", c:"Depende da placa (geralmente grave ou gravíssima)", d:"Leve", r:"C"},
+    {q:"A placa A-33a indica:", a:"Área escolar", b:"Crianças jogando bola", c:"Pedestres", d:"Passagem sinalizada", r:"A"},
+    {q:"Qual o significado da placa R-3?", a:"Sentido proibido", b:"Proibido virar à direita", c:"Proibido retornar", d:"Proibido mudar de faixa", r:"A"},
+    {q:"A placa R-24b indica:", a:"Passagem obrigatória à direita", b:"Vire à direita", c:"Siga à direita", d:"Entroncamento", r:"A"},
+    {q:"A sinalização de trânsito é dividida em:", a:"Horizontal e Vertical apenas", b:"Vertical, Horizontal, Dispositivos Auxiliares, Luminosa, Sonora e Gestos", c:"Placas e Luzes", d:"Só placas", r:"B"},
+    {q:"A placa A-21a indica:", a:"Estreitamento de pista ao centro", b:"Estreitamento de pista à esquerda", c:"Ponte estreita", d:"Pista irregular", r:"B"},
+    {q:"O condutor que circula com o veículo em mau estado de conservação comete infração:", a:"Gravíssima", b:"Grave", c:"Média", d:"Leve", r:"B"},
+    {q:"A placa R-7 indica:", a:"Proibido ultrapassar", b:"Proibido parar", c:"Proibido estacionar", d:"Mão dupla", r:"A"},
+    {q:"A placa A-32b indica:", a:"Passagem sinalizada de pedestres", b:"Trânsito de pedestres", c:"Área escolar", d:"Obras na pista", r:"A"},
+    {q:"Placas de serviços auxiliares (como postos de gasolina) têm cor:", a:"Amarela", b:"Verde", c:"Azul", d:"Marrom", r:"C"},
+    {q:"A placa R-19 indica:", a:"Velocidade máxima permitida", b:"Velocidade mínima", c:"Fim da proibição", d:"Peso por eixo", r:"A"},
+    {q:"A placa A-18 indica:", a:"Lombada", b:"Saliência ou lombada", c:"Depressão", d:"Pista escorregadia", r:"B"},
+    {q:"Onde deve ser colocada a placa de 'Pare' se não houver visibilidade?", a:"Em cima da calçada", b:"No ponto onde o condutor tenha visão da via transversal", c:"Bem longe do cruzamento", d:"Não precisa colocar", r:"B"},
+    {q:"A placa R-10 indica proibição de:", a:"Bicicletas", b:"Motos", c:"Veículos automotores", d:"Caminhões", r:"C"},
+    {q:"A placa A-30a indica:", a:"Ciclista", b:"Trânsito de ciclistas", c:"Ciclovia", d:"Proibido bicicletas", r:"B"},
+    {q:"A sinalização horizontal na cor vermelha serve para:", a:"Ciclovias e símbolos de farmácia/hospital", b:"Proibir estacionamento", c:"Dividir fluxos opostos", d:"Marcar faixas de pedestres", r:"A"},
+    {q:"A placa R-21 indica:", a:"Alfândega", b:"Pedágio", c:"Polícia", d:"Pare", r:"A"},
+    {q:"A placa A-42a indica:", a:"Fim de pista dupla", b:"Início de pista dupla", c:"Pista dividida", d:"Cruzamento", r:"B"},
+    {q:"Usar o triângulo é:", a:"Obrigatório em caso de imobilização por emergência", b:"Opcional na cidade", c:"Apenas para caminhões", d:"Só para usar à noite", r:"A"},
+    {q:"A placa R-16 indica:", a:"Largura máxima permitida", b:"Altura máxima", c:"Comprimento", d:"Peso bruto", r:"A"},
+    {q:"A placa A-11a indica:", a:"Junções sucessivas", b:"Entroncamento oblíquo à esquerda", c:"Cruzamento", d:"Bifurcação", r:"B"},
+    {q:"A linha simples tracejada branca permite:", a:"Ultrapassagem e mudança de faixa no mesmo sentido", b:"Conversão à esquerda", c:"Apenas parar", d:"Nada", r:"A"},
+    {q:"A placa R-25c indica:", a:"Siga em frente ou à esquerda", b:"Vire à esquerda", c:"Retorne", d:"Sentido único", r:"A"},
+    {q:"A placa A-9 indica:", a:"Cruzamento de vias", b:"Bifurcação em T", c:"Entroncamento", d:"Via lateral", r:"A"},
+    {q:"Ao encontrar a placa R-2 (Dê a Preferência), o condutor deve:", a:"Parar obrigatoriamente", b:"Reduzir a velocidade e parar se necessário", c:"Acelerar para passar logo", d:"Ignorar se não houver carros", r:"B"},
+    {q:"A placa A-13a indica:", a:"Confluência à esquerda", b:"Entroncamento", c:"Via lateral", d:"Curva", r:"A"},
+    {q:"Quais placas não podem ser desobedecidas sob pena de multa?", a:"De Advertência", b:"De Regulamentação", c:"De Indicação", d:"Todas", r:"B"},
+    {q:"A placa R-32 indica:", a:"Circulação exclusiva de ônibus", b:"Proibido ônibus", c:"Terminal rodoviário", d:"Ponto de parada", r:"A"},
+    {q:"A placa A-20a indica:", a:"Aclive acentuado (subida)", b:"Declive acentuado (descida)", c:"Ponte", d:"Lombada", r:"B"},
+    {q:"A placa R-14 indica:", a:"Peso máximo permitido", b:"Carga máxima permitida", c:"Peso por eixo", d:"Peso bruto total limitado", r:"D"},
+    {q:"A placa A-39 indica:", a:"Passagem de nível sem barreira", b:"Passagem de nível com barreira", c:"Cruz de Santo André", d:"Bondes", r:"A"},
+    {q:"As marcas que separam fluxos de sentidos opostos são de cor:", a:"Branca", b:"Amarela", c:"Vermelha", d:"Azul", r:"B"},
+    {q:"A placa R-30 indica:", a:"Proibido pedestres", b:"Pedestre, ande pela esquerda", c:"Pedestre, ande pela direita", d:"Área de pedestres", r:"B"},
+    {q:"A placa A-25 indica:", a:"Mão dupla adiante", b:"Sentido único", c:"Siga em frente", d:"Via lateral", r:"A"},
+    {q:"O sinal sonoro de um silvo longo indica:", a:"Atenção! Siga", b:"Diminua a marcha", c:"Pare", d:"Acenda as luzes", r:"B"},
+    {q:"A placa R-20 indica:", a:"Proibido buzinar ou sinal sonoro", b:"Silêncio hospital", c:"Escola", d:"Permitido buzinar", r:"A"},
+    {q:"A placa A-17 indica:", a:"Pista escorregadia", b:"Pista irregular", c:"Lombada", d:"Obras", r:"B"},
+    {q:"A placa R-5a indica:", a:"Proibido retornar à esquerda", b:"Proibido virar à esquerda", c:"Vire à esquerda", d:"Mão única", r:"A"},
+    {q:"O que significa a marcação de 'Zebra' (Canalização) no asfalto?", a:"Estacionamento", b:"Orientar fluxos, proibido trafegar sobre elas", c:"Área de pedestre", d:"Local de carga", r:"B"},
+    {q:"A placa A-2 indica:", a:"Curva acentuada à direita", b:"Curva à direita", c:"Pista sinuosa", d:"Entroncamento", r:"B"},
+    {q:"A placa R-12 indica:", a:"Proibido bicicletas", b:"Ciclovia", c:"Bicicleta, ande à direita", d:"Proibido motos", r:"A"},
+    {q:"As placas de atrativos turísticos são de cor:", a:"Azul", b:"Marrom", c:"Verde", d:"Amarela", r:"B"},
+    {q:"A placa A-40 indica:", a:"Passagem de nível com barreira", b:"Ferrovia", c:"Cruz de Santo André", d:"Vias sucessivas", r:"A"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50!");
+}
+</script>
+</body>
+</html>

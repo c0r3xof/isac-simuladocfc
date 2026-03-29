@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 2 - CFC (Direção Defensiva)</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; border-left: 6px solid #ddd; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: var(--certa); color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Início</a>
+    <div id="res-topo">Simulado 2</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Comparar Respostas</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"O que é Direção Defensiva?", a:"Dirigir rápido para evitar acidentes", b:"Conjunto de técnicas para prevenir acidentes", c:"Ignorar as placas de sinalização", d:"Dirigir apenas em rodovias", r:"B"},
+    {q:"Qual a distância correta a se manter do veículo da frente?", a:"1 metro", b:"Distância de seguimento (2 segundos)", c:"Colado no para-choque", d:"50 metros fixos", r:"B"},
+    {q:"A aquaplanagem é causada por:", a:"Excesso de óleo na pista", b:"Pneus carecas e água na pista", c:"Falta de freios", d:"Luz alta", r:"B"},
+    {q:"Em caso de neblina densa, o condutor deve usar:", a:"Luz alta", b:"Luz baixa ou farol de neblina", c:"Pisca-alerta ligado", d:"Apenas lanternas", r:"B"},
+    {q:"A fadiga e o sono são condições adversas do:", a:"Veículo", b:"Tempo", c:"Condutor", d:"Via", r:"C"},
+    {q:"Ao presenciar um acidente, a primeira atitude deve ser:", a:"Remover as vítimas", b:"Sinalizar o local e chamar socorro", c:"Dar água para as vítimas", d:"Seguir viagem", r:"B"},
+    {q:"Vítima de acidente em estado de choque apresenta:", a:"Pele quente e rosada", b:"Pele fria, pálida e pulso fraco", c:"Muita fome e sede", d:"Agitação extrema", r:"B"},
+    {q:"Não se deve retirar o capacete de um motociclista acidentado para evitar:", a:"Multas", b:"Lesão na coluna cervical", c:"Resfriado", d:"Quebra do visor", r:"B"},
+    {q:"O cinto de segurança de três pontos é mais eficiente porque:", a:"É mais bonito", b:"Retém o tórax e o abdômen", c:"É mais fácil de prender", d:"Não aperta o pescoço", r:"B"},
+    {q:"A força centrífuga tende a:", a:"Jogar o veículo para fora da curva", b:"Parar o veículo", c:"Aumentar a velocidade", d:"Travar as rodas", r:"A"},
+    {q:"O uso do telefone celular ao dirigir causa:", a:"Aumento da atenção", b:"Distração cognitiva e visual", c:"Melhora nos reflexos", d:"Menor consumo de combustível", r:"B"},
+    {q:"Em caso de queimaduras, o procedimento correto é:", a:"Passar pomada ou manteiga", b:"Lavar apenas com água corrente fria", c:"Furar as bolhas", d:"Colocar gelo direto", r:"B"},
+    {q:"O que indica um pulso muito rápido e fraco na vítima?", a:"Saúde perfeita", b:"Possível estado de choque ou hemorragia", c:"Sono profundo", d:"Cansaço físico", r:"B"},
+    {q:"Condição adversa de 'Via' refere-se a:", a:"Chuva e vento", b:"Buracos e má sinalização", c:"Pneus gastos", d:"Ofuscamento", r:"B"},
+    {q:"Para evitar colisões na traseira, deve-se:", a:"Frear bruscamente", b:"Sinalizar antes de manobrar", c:"Andar devagar na esquerda", d:"Usar luz alta", r:"B"},
+    {q:"A distância de parada é a soma de:", a:"Reação + Frenagem", b:"Seguimento + Reação", c:"Frenagem + Manobra", d:"Aceleração + Frenagem", r:"A"},
+    {q:"Sob chuva forte, o risco de perda de controle aumenta. Deve-se:", a:"Acelerar para sair logo da chuva", b:"Reduzir a velocidade e aumentar a distância", c:"Ligar o farol alto", d:"Frear bruscamente", r:"B"},
+    {q:"Vítimas com suspeita de fratura nos membros devem:", a:"Ser massageadas", b:"Ter os membros imobilizados antes da remoção", c:"Caminhar para testar a dor", d:"Tomar remédio imediato", r:"B"},
+    {q:"O método 'ABC' no socorro serve para avaliar:", a:"Motor do carro", b:"Vias aéreas, respiração e circulação", c:"As placas da via", d:"O óleo do motor", r:"B"},
+    {q:"O tempo de reação do condutor dura em média:", a:"5 segundos", b:"1 segundo", c:"10 segundos", d:"Meio minuto", r:"B"},
+    {q:"Ofuscamento é uma condição adversa de:", a:"Clima", b:"Luz", c:"Veículo", d:"Via", r:"B"},
+    {q:"A ergonomia serve para:", a:"Aumentar a velocidade", b:"Adaptar o veículo ao homem (conforto/segurança)", c:"Economizar pneus", d:"Poluir menos", r:"B"},
+    {q:"O extintor de incêndio deve ser usado:", a:"Deitado", b:"Em leque, na base das chamas", c:"Apenas no pneu", d:"Com o jato para cima", r:"B"},
+    {q:"Hemorragia externa deve ser controlada com:", a:"Garrote no pescoço", b:"Compressão direta com pano limpo", c:"Passando álcool", d:"Dando água à vítima", r:"B"},
+    {q:"Ao ser ultrapassado, o condutor deve:", a:"Acelerar", b:"Manter a velocidade ou facilitar a passagem", c:"Mudar de faixa rápido", d:"Ligar o farol alto", r:"B"},
+    {q:"O que é direção corretiva?", a:"Prever o perigo", b:"Agir após o perigo já ter acontecido", c:"Respeitar as placas", d:"Fazer manutenção preventiva", r:"B"},
+    {q:"Pneus com calibragem baixa causam:", a:"Mais estabilidade", b:"Maior desgaste e consumo de combustível", c:"Menor aderência", d:"Freadas mais rápidas", r:"B"},
+    {q:"A hemorragia interna é identificada por:", a:"Sangue jorrando", b:"Sede, palidez e pulso rápido", c:"Fome excessiva", d:"Riso histérico", r:"B"},
+    {q:"Em rodovias, o triângulo deve ser colocado a quantos passos?", a:"10 passos", b:"Pelo menos 30 passos (ou conforme a velocidade)", c:"5 passos", d:"No teto do carro", r:"B"},
+    {q:"O que fazer se o acelerador travar?", a:"Desligar a chave em movimento", b:"Colocar em ponto morto e frear gradualmente", c:"Pular do carro", d:"Puxar o freio de mão com força", r:"B"},
+    {q:"Onde deve-se verificar o pulso de uma vítima adulta?", a:"No pulso", b:"Na artéria carótida (pescoço)", c:"No pé", d:"No peito", r:"B"},
+    {q:"A 'distância de reação' é:", a:"Do freio até parar", b:"Do perigo visto até pisar no freio", c:"A distância do carro de trás", d:"O tempo de sono", r:"B"},
+    {q:"Luz baixa de dia em rodovias é:", a:"Proibido", b:"Obrigatório para veículos sem DRL", c:"Opcional", d:"Apenas para motos", r:"B"},
+    {q:"Em curvas, a aderência diminui devido à:", a:"Força centrípeta", b:"Força centrífuga", c:"Gravidade", d:"Pressão do óleo", r:"B"},
+    {q:"Derrapagem de traseira deve ser corrigida:", a:"Virando o volante para o lado oposto", b:"Virando o volante para o mesmo lado da derrapagem", c:"Pisando no freio com força", d:"Puxando o freio de mão", r:"B"},
+    {q:"O uso do colar cervical ajuda a evitar:", a:"Dor de garganta", b:"Lesão na medula por movimentação", c:"Falta de ar", d:"Sangramento nasal", r:"B"},
+    {q:"O que significa 'ver e ser visto'?", a:"Usar óculos escuros", b:"Sinalizar intenções e usar luzes corretamente", c:"Olhar para todos os pedestres", d:"Ter luzes neon no carro", r:"B"},
+    {q:"A omissão de socorro é:", a:"Um direito do cidadão", b:"Crime previsto no CTB", c:"Permitido se houver pressa", d:"Obrigatório apenas para médicos", r:"B"},
+    {q:"Animais na pista. Como agir?", a:"Buzinar forte", b:"Ligar o farol alto", c:"Reduzir a velocidade sem buzinar", d:"Acelerar para espantá-los", r:"C"},
+    {q:"Ponto cego é:", a:"Um lugar sem luz", b:"Área não visível pelos retrovisores", c:"Vidro sujo", d:"Farol queimado", r:"B"},
+    {q:"O catalisador serve para:", a:"Aumentar a potência", b:"Reduzir a emissão de gases poluentes", c:"Filtrar o óleo", d:"Resfriar o motor", r:"B"},
+    {q:"Vítima com objeto encravado no corpo. O que fazer?", a:"Retirar o objeto imediatamente", b:"Imobilizar o objeto e não retirá-lo", c:"Lavar com álcool", d:"Girar o objeto", r:"B"},
+    {q:"Hidroplanagem é o mesmo que:", a:"Derrapagem no óleo", b:"Aquaplanagem", c:"Falta de combustível", d:"Pane elétrica", r:"B"},
+    {q:"O uso de luz alta em sentido contrário causa:", a:"Segurança", b:"Ofuscamento e cegueira momentânea", c:"Melhor visão", d:"Multa leve", r:"B"},
+    {q:"A manutenção preventiva ajuda a:", a:"Gastar mais dinheiro", b:"Evitar falhas mecânicas e acidentes", c:"Aumentar multas", d:"Mudar a cor do carro", r:"B"},
+    {q:"O que é 'interação social no trânsito'?", a:"Fazer amigos no sinal", b:"Respeito mútuo entre condutores e pedestres", c:"Discutir por fechadas", d:"Usar redes sociais dirigindo", r:"B"},
+    {q:"Em descidas de serra, deve-se usar:", a:"Ponto morto", b:"Veículo engrenado (freio motor)", c:"Apenas o freio de mão", d:"Desligar o motor", r:"B"},
+    {q:"Se o carro cair na água, a primeira coisa é:", a:"Ligar para a polícia", b:"Abrir ou quebrar o vidro antes que afunde", c:"Esperar o carro encher de água", d:"Tentar ligar o motor", r:"B"},
+    {q:"O excesso de carga influi na:", a:"Cor do veículo", b:"Estabilidade e frenagem", c:"Quantidade de óleo", d:"Validade da CNH", r:"B"},
+    {q:"Dirigir com cansaço extremo é comparável a:", a:"Dirigir bem", b:"Dirigir sob efeito de álcool", c:"Ser um piloto profissional", d:"Economizar tempo", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 50!");
+}
+</script>
+</body>
+</html>
