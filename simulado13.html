@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 13 - Prova Oficial 2016</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: #007bff; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Portal</a>
+    <div id="res-topo">Prova Oficial 2016</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Finalizar Prova 2016</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"A placa A-1a indica:", a:"Curva acentuada à direita", b:"Curva acentuada à esquerda", c:"Pista sinuosa", d:"Pista irregular", r:"B"},
+    {q:"O condutor que deixa de prestar socorro à vítima de acidente, podendo fazê-lo, comete infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"Qual a quilometragem média recomendada para o rodízio de pneus?", a:"20.000 km", b:"10.000 km", c:"50.000 km", d:"5.000 km", r:"B"},
+    {q:"A placa R-25a indica:", a:"Vire à esquerda", b:"Vire à direita", c:"Siga em frente", d:"Proibido virar", r:"A"},
+    {q:"O que deve ser feito ao encontrar uma vítima com fratura exposta?", a:"Colocar o osso no lugar", b:"Cobrir o local com pano limpo e aguardar socorro", c:"Passar álcool no osso", d:"Fazer um torniquete", r:"B"},
+    {q:"A principal causa da poluição do ar nas cidades é:", a:"O lixo doméstico", b:"A emissão de gases pelos veículos automotores", c:"A poeira das estradas", d:"As árvores", r:"B"},
+    {q:"O sinal luminoso vermelho indica:", a:"Atenção", b:"Parada obrigatória", c:"Siga com cuidado", d:"Velocidade reduzida", r:"B"},
+    {q:"O que significa a placa A-21a?", a:"Estreitamento de pista ao centro", b:"Ponte estreita", c:"Estreitamento de pista à esquerda", d:"Curva", r:"A"},
+    {q:"A embreagem tem a função de:", a:"Frear o carro", b:"Ligar e desligar a força do motor ao câmbio", c:"Aumentar a velocidade", d:"Resfriar o motor", r:"B"},
+    {q:"O uso da buzina entre as 22h e 06h é:", a:"Permitido em qualquer situação", b:"Proibido", c:"Permitido se houver perigo", d:"Obrigatório", r:"B"},
+    {q:"A placa R-4b indica:", a:"Proibido virar à esquerda", b:"Proibido virar à direita", c:"Vire à direita", d:"Sentido único", r:"B"},
+    {q:"O condutor defensivo deve saber que a chuva reduz a:", a:"Velocidade", b:"Visibilidade e a aderência dos pneus", c:"Poluição do carro", d:"Vontade de dirigir", r:"B"},
+    {q:"Ao ser ultrapassado, o condutor deve:", a:"Acelerar", b:"Facilitar a ultrapassagem, mantendo a velocidade ou reduzindo-a levemente", c:"Mudar de faixa", d:"Ligar o farol alto", r:"B"},
+    {q:"A placa A-33a indica:", a:"Passagem de pedestres", b:"Área escolar", c:"Crianças", d:"Parque", r:"B"},
+    {q:"O sistema de direção serve para:", a:"Parar o veículo", b:"Transmitir o movimento do volante às rodas dianteiras", c:"Trocar as marchas", d:"Amortecer impactos", r:"B"},
+    {q:"Em caso de convulsão, a primeira atitude é:", a:"Prender a língua da vítima", b:"Proteger a cabeça da vítima e afastar objetos próximos", c:"Dar água com açúcar", d:"Bater no rosto para acordar", r:"B"},
+    {q:"A placa R-15 indica:", a:"Altura máxima permitida", b:"Largura", c:"Peso", d:"Comprimento", r:"A"},
+    {q:"Transitar em marcha à ré em esquinas é:", a:"Permitido", b:"Proibido", c:"Obrigatório", d:"Livre", r:"B"},
+    {q:"Qual componente mantém a bateria carregada com o motor em funcionamento?", a:"Motor de partida", b:"Alternador", c:"Bobina", d:"Velas", r:"B"},
+    {q:"A placa A-19 indica:", a:"Depressão", b:"Lombada ou saliência", c:"Pista irregular", d:"Obras", r:"B"},
+    {q:"Fazer 'racha' é considerado:", a:"Infração leve", b:"Crime de trânsito", c:"Atitude correta", d:"Apenas falta de educação", r:"B"},
+    {q:"A distância de frenagem é:", a:"Do perigo até pisar no freio", b:"Do momento em que o freio é acionado até a parada total", c:"Igual à de reação", d:"Sempre 10 metros", r:"B"},
+    {q:"A placa R-26 indica:", a:"Siga em frente", b:"Sentido proibido", c:"Pare", d:"Dê a preferência", r:"A"},
+    {q:"O fluido de freio deve ser trocado:", a:"A cada mês", b:"Segundo a recomendação do fabricante", c:"Apenas se vazar", d:"Nunca", r:"B"},
+    {q:"A placa A-42b indica:", a:"Início de pista dupla", b:"Fim de pista dupla", c:"Mão dupla", d:"Pista dividida", r:"B"},
+    {q:"Vítima de acidente em estado de choque deve ser mantida:", a:"De pé", b:"Deitada com as pernas elevadas (se não houver fratura)", c:"Sentada", d:"Caminhando", r:"B"},
+    {q:"Onde deve-se usar o farol alto à noite?", a:"Vias com iluminação pública", b:"Vias sem iluminação pública, exceto ao cruzar ou seguir outro veículo", c:"Em túneis", d:"Sempre", r:"B"},
+    {q:"A placa R-6a indica:", a:"Proibido estacionar", b:"Proibido parar", c:"Estacionamento regulamentado", d:"Proibido retorno", r:"A"},
+    {q:"O que é aquaplanagem?", a:"Falta de água no motor", b:"Deslizamento do veículo sobre uma camada de água na pista", c:"Lavagem do chassi", d:"Dirigir na chuva", r:"B"},
+    {q:"O condutor que avançar o sinal vermelho comete infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 30!");
+}
+</script>
+</body>
+</html>
