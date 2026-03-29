@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado 16 - Prova Oficial 2019</title>
+    <style>
+        :root { --certa: #28a745; --errada: #dc3545; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #333; }
+        .navbar { position: sticky; top: 0; background: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .btn-back { text-decoration: none; color: #007bff; font-weight: bold; border: 1px solid #007bff; padding: 8px 15px; border-radius: 5px; transition: 0.3s; }
+        .btn-back:hover { background: #007bff; color: white; }
+        .question { margin-bottom: 30px; padding: 20px; border-radius: 10px; border-left: 6px solid #ddd; background: #fff; border: 1px solid #eee; }
+        .question p { font-weight: 600; font-size: 1.1em; margin-top: 0; }
+        .options label { display: block; padding: 12px; margin: 10px 0; background: #f8f9fa; border-radius: 8px; cursor: pointer; border: 1px solid #ececec; }
+        .correct { border-left-color: var(--certa) !important; background-color: #d4edda !important; }
+        .wrong { border-left-color: var(--errada) !important; background-color: #f8d7da !important; }
+        .feedback { display: none; margin-top: 15px; font-weight: bold; }
+        .btn-check { background: #007bff; color: white; border: none; padding: 20px; width: 100%; border-radius: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        #res-topo { font-size: 1.5em; color: #007bff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html" class="btn-back">← Voltar ao Portal</a>
+    <div id="res-topo">Prova Oficial 2019</div>
+</div>
+
+<div class="container">
+    <form id="quiz-form">
+        <div id="questoes-area"></div>
+        <button type="button" class="btn-check" onclick="corrigir()">Finalizar Prova 2019</button>
+    </form>
+</div>
+
+<script>
+const dados = [
+    {q:"A placa R-25b indica:", a:"Vire à direita", b:"Siga à direita", c:"Vire à esquerda", d:"Retorno", r:"A"},
+    {q:"Qual a finalidade da válvula termostática?", a:"Gerar faísca", b:"Controlar a passagem da água entre o motor e o radiador", c:"Esfriar os pneus", d:"Trocar a marcha", r:"B"},
+    {q:"O condutor que transita com luz alta em vias iluminadas comete infração:", a:"Média", b:"Leve", c:"Grave", d:"Gravíssima", r:"B"},
+    {q:"A placa A-13a indica:", a:"Confluência à esquerda", b:"Entroncamento", c:"Via lateral", d:"Curva acentuada", r:"A"},
+    {q:"O que é 'aquaplanagem'?", a:"Falta de óleo", b:"Perda da aderência dos pneus com o solo devido a uma camada de água", c:"Motor fervendo", d:"Lavar o carro", r:"B"},
+    {q:"A placa R-5b indica:", a:"Proibido retornar à direita", b:"Proibido virar", c:"Siga em frente", d:"Curva", r:"A"},
+    {q:"Ao socorrer uma vítima de acidente, deve-se priorizar o quê?", a:"Verificar documentos", b:"Limpar a via", c:"Manter a vítima viva e evitar o agravamento das lesões", d:"Consertar o carro", r:"C"},
+    {q:"A sinalização horizontal de cor branca em forma de 'X' indica:", a:"Pare", b:"Cruzamento rodoferroviário (Passagem de nível)", c:"Área de pedestre", d:"Proibido parar", r:"B"},
+    {q:"Qual peça é responsável por misturar o ar e o combustível (em carros antigos)?", a:"Alternador", b:"Carburador", c:"Radiador", d:"Diferencial", r:"B"},
+    {q:"A placa A-18 indica:", a:"Saliência ou lombada", b:"Pista irregular", c:"Depressão", d:"Obras", r:"C"},
+    {q:"Transitar pela contramão em vias de sentido único é infração:", a:"Grave", b:"Gravíssima", c:"Média", d:"Leve", r:"B"},
+    {q:"O uso da luz baixa durante o dia em rodovias de pista simples é:", a:"Obrigatório", b:"Opcional", c:"Proibido", d:"Apenas para motos", r:"A"},
+    {q:"A placa R-16 indica o limite de:", a:"Largura máxima permitida", b:"Altura", c:"Peso", d:"Comprimento", r:"A"},
+    {q:"O que o condutor deve fazer ao perceber que o freio não está funcionando?", a:"Desligar o motor imediatamente", b:"Reduzir as marchas gradativamente e usar o freio de mão suavemente", c:"Pular do carro", d:"Acelerar", r:"B"},
+    {q:"A placa A-40 indica:", a:"Passagem de nível sem barreira", b:"Passagem de nível com barreira", c:"Cruz de Santo André", d:"Bonde", r:"A"},
+    {q:"A poluição atmosférica causada por veículos pode ser reduzida:", a:"Retirando o catalisador", b:"Mantendo o motor regulado e filtros limpos", c:"Usando gasolina adulterada", d:"Aumentando o ruído", r:"B"},
+    {q:"A placa R-27 indica:", a:"Caminhões mantenham-se à direita", b:"Proibido caminhões", c:"Carga e descarga", d:"Ônibus à esquerda", r:"A"},
+    {q:"O cinto de segurança de dois pontos deve ser usado:", a:"No pescoço", b:"Sobre a região pélvica (quadril)", c:"No peito", d:"Não deve ser usado", r:"B"},
+    {q:"Vítima de acidente com objeto empalado. Você deve:", a:"Remover o objeto", b:"Não remover e imobilizar o objeto", c:"Passar pomada", d:"Lavar com água", r:"B"},
+    {q:"A placa A-26a indica:", a:"Sentido único", b:"Sentido duplo", c:"Mão dupla adiante", d:"Pare", r:"A"},
+    {q:"O órgão que coordena o Sistema Nacional de Trânsito é o:", a:"Contran", b:"Detran", c:"Ciretran", d:"Denatran", r:"A"},
+    {q:"A função do diferencial no veículo é:", a:"Gerar faísca", b:"Permitir que as rodas de um mesmo eixo girem em velocidades diferentes em curvas", c:"Esfriar o óleo", d:"Ligar o farol", r:"B"},
+    {q:"A placa R-1 indica:", a:"Parada obrigatória", b:"Dê a preferência", c:"Cuidado", d:"Pare adiante", r:"A"},
+    {q:"Qual a cor da placa que indica 'Serviços Auxiliares' (Mecânico, Restaurante)?", a:"Amarela", b:"Azul", c:"Verde", d:"Branca", r:"B"},
+    {q:"A placa A-32a indica:", a:"Passagem de pedestres", b:"Trânsito de pedestres", c:"Área escolar", d:"Crianças", r:"B"},
+    {q:"Onde deve-se verificar o nível de óleo do motor?", a:"Com o motor quente", b:"Com o motor frio e em local plano", c:"Em movimento", d:"Toda vez que abastecer", r:"B"},
+    {q:"O condutor que usa o celular ao dirigir (mesmo no viva-voz) comete infração:", a:"Média", b:"Grave", c:"Gravíssima", d:"Leve", r:"C"},
+    {q:"A placa R-33 indica:", a:"Interseção em círculo (Rotatória)", b:"Sentido obrigatório", c:"Pare", d:"Vire", r:"A"},
+    {q:"Qual manobra é proibida em rodovias, exceto em locais apropriados?", a:"Ultrapassagem", b:"Retorno", c:"Troca de faixa", d:"Ligar o farol", r:"B"},
+    {q:"A placa A-1b indica:", a:"Curva acentuada à direita", b:"Curva à direita", c:"Pista sinuosa", d:"Curva à esquerda", r:"A"}
+];
+
+const area = document.getElementById('questoes-area');
+dados.forEach((p, i) => {
+    area.innerHTML += `
+        <div class="question" id="box-q${i}">
+            <p>${i+1}. ${p.q}</p>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A) ${p.a}</label>
+                <label><input type="radio" name="q${i}" value="B"> B) ${p.b}</label>
+                <label><input type="radio" name="q${i}" value="C"> C) ${p.c}</label>
+                <label><input type="radio" name="q${i}" value="D"> D) ${p.d}</label>
+            </div>
+            <div class="feedback" id="f-q${i}">Resposta Correta: ${p.r}</div>
+        </div>
+    `;
+});
+
+function corrigir() {
+    let acertos = 0;
+    dados.forEach((p, i) => {
+        const sel = document.querySelector(`input[name="q${i}"]:checked`);
+        const box = document.getElementById(`box-q${i}`);
+        const feed = document.getElementById(`f-q${i}`);
+        feed.style.display = "block";
+        if(sel && sel.value === p.r) {
+            box.className = "question correct";
+            acertos++;
+            feed.innerHTML = "✅ Correto!";
+            feed.style.color = "#155724";
+        } else {
+            box.className = "question wrong";
+            feed.innerHTML = "❌ Errado! Resposta certa: " + p.r;
+            feed.style.color = "#721c24";
+        }
+    });
+    window.scrollTo(0,0);
+    alert("Você acertou " + acertos + " de 30!");
+}
+</script>
+</body>
+</html>
