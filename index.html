@@ -6,20 +6,44 @@
     <title>Portal de Simulados CFC</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 40px; text-align: center; }
-        h1 { color: #343a40; margin-bottom: 30px; }
-        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; max-width: 1000px; margin: 0 auto; }
-        .simulado-link { background: white; padding: 25px; border-radius: 12px; text-decoration: none; color: #007bff; font-weight: bold; font-size: 1.1em; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { color: #343a40; margin-bottom: 10px; }
+        h2 { color: #6c757d; margin: 30px 0 15px 0; font-size: 1.5em; border-bottom: 2px solid #dee2e6; display: inline-block; padding-bottom: 5px; }
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; max-width: 1100px; margin: 0 auto; }
+        .simulado-link { background: white; padding: 20px; border-radius: 12px; text-decoration: none; color: #007bff; font-weight: bold; font-size: 1em; transition: 0.3s; border: 2px solid transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .simulado-link span { font-size: 0.8em; color: #6c757d; font-weight: normal; margin-top: 5px; }
         .simulado-link:hover { background: #007bff; color: white; transform: translateY(-5px); border-color: #0056b3; }
+        .simulado-link:hover span { color: #d1d1d1; }
+        .secao { margin-bottom: 50px; }
     </style>
 </head>
 <body>
-    <h1>Escolha seu Simulado CFC</h1>
-    <div class="container" id="menu">
-        <script>
-            for(let i=1; i<=10; i++) {
-                document.write(`<a href="simulado${i}.html" class="simulado-link">Simulado ${i}</a>`);
-            }
-        </script>
+
+    <h1>Portal de Simulados CFC</h1>
+    <p>Prepare-se para a prova oficial com 1.000 questões exclusivas.</p>
+
+    <div class="secao">
+        <h2>Simulados Temáticos (1 a 10)</h2>
+        <div class="container">
+            <script>
+                for(let i=1; i<=10; i++) {
+                    document.write(`<a href="simulado${i}.html" class="simulado-link">Simulado ${i} <span>Treinamento Geral</span></a>`);
+                }
+            </script>
+        </div>
     </div>
+
+    <div class="secao">
+        <h2>Provas Oficiais Anteriores (11 a 20)</h2>
+        <div class="container">
+            <script>
+                const anos = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023];
+                for(let i=11; i<=20; i++) {
+                    let ano = anos[i-11];
+                    document.write(`<a href="simulado${i}.html" class="simulado-link">Simulado ${i} <span>Prova Oficial ${ano}</span></a>`);
+                }
+            </script>
+        </div>
+    </div>
+
 </body>
 </html>
